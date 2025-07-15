@@ -121,12 +121,13 @@ docker run -d -p 80:80 --name project-container  project-image
 - Verify whether container is running or not
 
 ```bash
-docker ps
+docker images
 # Or
 docker ps -a
 
 ```
 
+![docker-images.png](./img/docker-images.png)
 Then Copy the paste the ec2-server in your favourite browser search box and you should see the output of index.html
 
 ### STEP 2
@@ -164,7 +165,10 @@ Validation
   - Allow Permissions
     - ssh(type), 22(port), Anywhere(Source Type)
     - http(type),80 (port) ,Anywhere(Source Type)
+      ![ec2-server-SG.png](./img/ec2-server-SG.png)
 - Configure Storage : leave default value (8GiB, gp3)
+  ![ec2-server-instance.png](./img/ec2-server-instance.png)
+  ![ec2-server-instance-1.png](./img/ec2-server-instance-1.png)
 
 ## SSH into the instance
 
@@ -177,6 +181,8 @@ ssh -i <your-key-pair> ec2-user@<ec2-server-public-ip>
 sudo su
 # To become root user
 ```
+
+![ec2-server-ssh.png](./img/ec2-server-ssh.png)
 
 ### Update Package Manager
 
@@ -235,7 +241,7 @@ docker ps
      Use the AWS CLI:
 
      ```bash
-
+      aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 866134557404.dkr.ecr.us-east-1.amazonaws.com
      ```
 
   2. Build your Docker image using the following command. For information on building a Docker file from scratch, You can skip this step if your image has already been built:
@@ -247,13 +253,13 @@ docker ps
   3. After the build is completed, tag your image so you can push the image to this repository:
 
      ```bash
-
+      docker tag myecr-repo:latest 866134557404.dkr.ecr.us-east-1.amazonaws.com/myecr-repo:latest
      ```
 
   4. Run the following command to push this image to your newly created AWS repository:
 
      ```bash
-
+      docker push 866134557404.dkr.ecr.us-east-1.amazonaws.com/myecr-repo:latest
      ```
 
 - Before we can login to our respository from our terminal, we need to create a permission so we need to create a role and attach a permission (`administrative` permission) before login step.
@@ -300,6 +306,8 @@ aws configure
 # Enter your access and secret access key, leave other entry like default region and default output format blank / pass the required details.
 ```
 
+![aws-configure.png](./img/aws-configure.png)
+
 # `STEP 2.2` Login to Elastic Container Registry from AWS CLI, (`STEP 2.3`)Tag the Image and (`STEP 2.4`) Push your Image to Amazon ECR
 
 - Go to ECR Repository
@@ -309,7 +317,7 @@ aws configure
    Use the AWS CLI:
 
    ```bash
-
+    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 866134557404.dkr.ecr.us-east-1.amazonaws.com
    ```
 
 2. Build your Docker image using the following command. For information on building a Docker file from scratch, You can skip this step if your image has already been built:
@@ -321,14 +329,16 @@ aws configure
 3. After the build is completed, tag your image so you can push the image to this repository:
 
    ```bash
-
+    docker tag myecr-repo:latest 866134557404.dkr.ecr.us-east-1.amazonaws.com/myecr-repo:latest
    ```
 
 4. Run the following command to push this image to your newly created AWS repository:
 
    ```bash
-
+    docker push 866134557404.dkr.ecr.us-east-1.amazonaws.com/myecr-repo:latest
    ```
+
+![build-tag-and-push-docker-image.png](./img/build-tag-and-push-docker-image.png)
 
 # `STEP 3`: CREATING A APPLICATION LOAD BALANCER
 
@@ -342,6 +352,7 @@ aws configure
    ![select-ec2-server-SG-and-click-on-target-group.png](./img/select-ec2-server-SG-and-click-on-target-group.png)
    ![alt text](./img/Create-Target-Group.png)
 5. Post Creating Target Group, Select and then click on Create Load Balancer Button.
+   ![Load-Balancer.png](./img/Load-Balancer.png)
 
 ---
 
